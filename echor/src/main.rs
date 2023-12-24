@@ -3,6 +3,8 @@ use clap::{
     Arg
 };
 
+/// This function registers the command line program, and provides a help
+/// argument flag.
 fn cmd_args() -> clap::ArgMatches<'static> {
     App::new("echor")
         .version("0.1.0")
