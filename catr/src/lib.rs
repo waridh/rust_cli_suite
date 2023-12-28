@@ -60,9 +60,9 @@ pub fn run(config: Config) -> MyResult<()> {
 
     for filename in config.files {
         match open(&filename) {
-            Ok(_) => println!("Opened {filename}"),
+            Ok(x) => x.lines().for_each(|ele| println!("{}", ele.unwrap())),
             Err(e) => {
-                eprintln!("Failed to open {filename}:");
+                eprint!("Failed to open {filename}: ");
                 print_and_exit(e)},
         }
     };
