@@ -1,35 +1,71 @@
 use clap::{App, Arg};
-use std::{error::Error, fs};
+use std::{
+    error::Error,
+    fs,
+    io::{self, BufRead, BufReader}
+};
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
-fn clap_set() -> clap::ArgMatches<'static> {
-    App::new("catr").version("0.1.0").author("Bach").about("Rust cat")
+#[derive(Debug)]
+pub struct Config {
+    files: Vec<String>,
+    number_lines: bool,
+    number_nonblank_lines: bool,
+}
+
+/// Registers the application with clap, and takes in the specified arguments.
+/// Use -h to read the description of the application.
+pub fn clap_set() -> MyResult<Config> {
+    let matches = App::new("catr").version("0.1.0").author("Bach").about("Rust cat")
         .arg(
             Arg::with_name("file_name")
             .value_name("FILE_NAME")
             .help("File names")
-            .required(true)
-            .min_values(1),
+            .multiple(true)
+            .default_value("-"),
             )
         .arg(
             Arg::with_name("numbered").short("n").help("Print line numbers")
-            .takes_value(false),
+            .takes_value(false).conflicts_with("number_nonblank"),
             )
         .arg(
             Arg::with_name("numbered_noblank").short("b")
             .help("Print line numbers on non-blank lines")
             .takes_value(false),
             )
-        .get_matches()
+        .get_matches();
+
+       Ok(Config {
+           // Safe operation due to default value
+           files: matches.values_of_lossy("file_name").unwrap(),
+           number_lines: matches.is_present("numbered"),
+           number_nonblank_lines: matches.is_present("numbered_noblank"),
+       }) 
 }
 
-pub fn run() -> MyResult<()> {
-    let matches = clap_set();
+fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(fs::File::open(filename)?))),
+    }
+}
 
-    let file_names = matches.values_of_lossy("file_name").unwrap();
+pub fn print_and_exit(e: Box<dyn Error>) {
+    eprintln!("{e}");
+    std::process::exit(1);
+}
 
-    file_names.into_iter().map(|ele| fs::read_to_string(&ele).unwrap())
-        .for_each(|content| print!("{content}"));
+pub fn run(config: Config) -> MyResult<()> {
+
+    for filename in config.files {
+        match open(&filename) {
+            Ok(_) => println!("Opened {filename}"),
+            Err(e) => {
+                eprintln!("Failed to open {filename}:");
+                print_and_exit(e)},
+        }
+    };
+
     Ok(())
 }

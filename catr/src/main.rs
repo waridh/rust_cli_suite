@@ -1,6 +1,7 @@
 fn main() {
-    if let Err(e) = catr::run() {
-        eprint!("{e}");
-        std::process::exit(1)
+
+    // Function return unwrapping
+    if let Err(e) = catr::clap_set().and_then(catr::run) {
+        catr::print_and_exit(e)
     }
 }
