@@ -12,7 +12,7 @@ const FOX: &str = "tests/inputs/fox.txt";
 const SPIDERS: &str = "tests/inputs/spiders.txt";
 const BUSTLE: &str = "tests/inputs/the-bustle.txt";
 
-// --------------------------------------------------
+/// Testing that the usage instruction shows up
 #[test]
 fn usage() -> TestResult {
     for flag in &["-h", "--help"] {
@@ -24,7 +24,7 @@ fn usage() -> TestResult {
     Ok(())
 }
 
-// --------------------------------------------------
+/// Creates a file that does not exist
 fn gen_bad_file() -> String {
     loop {
         let filename: String = rand::thread_rng()
@@ -39,7 +39,7 @@ fn gen_bad_file() -> String {
     }
 }
 
-// --------------------------------------------------
+/// Testing if the program can safely handle a file that does not exist
 #[test]
 fn skips_bad_file() -> TestResult {
     let bad = gen_bad_file();
@@ -52,7 +52,8 @@ fn skips_bad_file() -> TestResult {
     Ok(())
 }
 
-// --------------------------------------------------
+/// This runner will grab the expected file from the file system and compare
+/// it with the current program output.
 fn run(args: &[&str], expected_file: &str) -> TestResult {
     let expected = fs::read_to_string(expected_file)?;
     Command::cargo_bin(PRG)?
@@ -63,7 +64,7 @@ fn run(args: &[&str], expected_file: &str) -> TestResult {
     Ok(())
 }
 
-// --------------------------------------------------
+/// Helper function that writes the input through the stdin for the program
 fn run_stdin(input_file: &str, args: &[&str], expected_file: &str) -> TestResult {
     let input = fs::read_to_string(input_file)?;
     let expected = fs::read_to_string(expected_file)?;
