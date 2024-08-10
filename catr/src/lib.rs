@@ -63,7 +63,7 @@ fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
 }
 
 fn print_numbered_line(count: usize, line: &str) {
-    println!("     {}\t{}", count, line);
+    println!("{:>6}\t{}", count, line);
 }
 
 /// From an IO buffer, does the corresponding cat print based on the config struct
