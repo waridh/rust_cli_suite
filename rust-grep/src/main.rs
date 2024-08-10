@@ -1,12 +1,12 @@
-use std::{
-    env,
-    process,
-};
+use std::{env, process};
 
-use rust_grep::{
-    Config,
-    run
-};
+use clap::Parser;
+
+use rust_grep::{run, Config};
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {}
 
 /*
  *  Planning
@@ -18,19 +18,16 @@ use rust_grep::{
 
 // Program entry point
 fn main() {
-    let args: Vec<String> = env::args().collect();  // getting cmd line args
+    let args: Vec<String> = env::args().collect(); // getting cmd line args
 
     let config = Config::build(&args).unwrap_or_else(|err| {
         eprintln!("Parsing error: {}", err);
         process::exit(1)
     });
 
-    if let Err(x) = run(config) {   // Running the main program here.
+    if let Err(x) = run(config) {
+        // Running the main program here.
         eprintln!("Application Error: {}", x);
         process::exit(1)
     };
 }
-
-
-
-
